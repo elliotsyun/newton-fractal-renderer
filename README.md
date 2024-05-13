@@ -11,6 +11,6 @@ cd newtons-fractal-visualizer
 Install Python Dependencies
 pip install pillow
 pip install numpy
-pip install matplotlib
 
-
+Run it!
+python ./fractal.py
