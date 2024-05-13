@@ -6,42 +6,49 @@ from PIL import Image
 WIDTH = 1024
 HEIGHT = 768
 
-# setting up the polynomial
+# setting up the polynomial z^3 - 1
 coeff = [1, 0, 0, -1]
 poly = np.poly1d(coeff)
-print("This is the polynomial we are using", poly)
 
 # calculate the roots of the polynomial
 roots = np.roots(coeff)
-print("These are the roots of the polynomial: ", roots)
+tolerance = 1e-6
 
 # set up the image
 img = Image.new("RGB", (WIDTH, HEIGHT))
-pixels = img.load
+pixels = img.load()
 
 
-# newton-raphson method
 def newton(x, y):
-    zn = complex(x, y)
+    z = complex(x, y)
+    for iter in range(1000):
+        z = z - (poly / poly.deriv())
 
-    zn = complex(x, y)  # make pixel into complex number with x and y val
-    zn = zn - (poly / sp.Derivative(poly))
+        for root in roots:
+            if abs(root - z) < tolerance:
+                return point_to_rgb(iter)
 
-    for key in roots_dict:
-        if roots_dict[key] - zn < 0.1:
-            key + 1
-            return to_rgb(zn)
-    return (0, 0, 0)  # default color
+    return (0, 0, 0)
 
 
-def to_rgb(i):
+def point_to_rgb(i):
     color = 255 * np.array(colorsys.hsv_to_rgb(i / 255.0, 1.0, 0.5))
     return tuple(color.astype(int))
 
 
-for x in range(img.size[0]):  # iterate for every pixel on the image
-    for y in range(img.size[1]):
-        pixels[x, y] = newton(x, y)
+def main():
+    print("This is the polynomial we are using", poly)
+    print("These are the roots of the polynomial: ", roots)
+
+    for x in range(img.size[0]):
+        for y in range(img.size[1]):
+            pixels[x, y] = newton(x - (WIDTH / 2), y - (HEIGHT / 2))
+
+    img.show()
 
 
-img.show()
+main()
+
+
+if __name__ == "main":
+    main()
