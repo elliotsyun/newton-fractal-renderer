@@ -21,8 +21,14 @@ pixels = img.load()
 
 def newton(x, y):
     z = complex(x, y)
-    for iter in range(1000):
-        z = z - (poly / poly.deriv())
+    for iter in range(100):
+        polyz = poly(z)
+        polyderiv = poly.deriv()(z)
+
+        if polyderiv == 0:
+            break
+
+        z -= polyz / polyderiv
 
         for root in roots:
             if abs(root - z) < tolerance:
@@ -36,19 +42,18 @@ def point_to_rgb(i):
     return tuple(color.astype(int))
 
 
-def main():
-    print("This is the polynomial we are using", poly)
-    print("These are the roots of the polynomial: ", roots)
+print("This is the polynomial we are using", poly)
+print("These are the roots of the polynomial: ", roots)
 
-    for x in range(img.size[0]):
-        for y in range(img.size[1]):
-            pixels[x, y] = newton(x - (WIDTH / 2), y - (HEIGHT / 2))
+real_range = (-2, 2)
+imag_range = (-1.5, 1.5)
 
-    img.show()
+for x in range(WIDTH):
+    print("%.2f %%" % (x / WIDTH * 100.0))
+    for y in range(HEIGHT):
 
+        pixels[x, y] = newton(
+            (x - (0.75 * WIDTH)) / (WIDTH / 4), (y - (WIDTH / 4)) / (WIDTH / 4)
+        )
 
-main()
-
-
-if __name__ == "main":
-    main()
+img.show()
