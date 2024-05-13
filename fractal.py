@@ -1,6 +1,5 @@
 import numpy as np
 import colorsys
-import sympy as sp
 from PIL import Image
 
 # setting up the image
@@ -8,24 +7,31 @@ WIDTH = 1024
 HEIGHT = 768
 
 # setting up the polynomial
-z = sp.symbols("z")
-poly = z**3 - 1
-print("This is the polynomial we are using" + poly)
+coeff = [1, 0, 0, -1]
+poly = np.poly1d(coeff)
+print("This is the polynomial we are using", poly)
 
 # calculate the roots of the polynomial
-roots_dict = sp.roots(poly, z)
+roots = np.roots(coeff)
+print("These are the roots of the polynomial: ", roots)
+
+# set up the image
+img = Image.new("RGB", (WIDTH, HEIGHT))
+pixels = img.load
 
 
-# function applying newton-raphson formula (ENDED HERE)
-
-
+# newton-raphson method
 def newton(x, y):
-    zn = complex(x, y)  # starting number/current guess
-    zn1 = zn - (poly/sp.Derivative(poly))
-    return None
+    zn = complex(x, y)
 
+    zn = complex(x, y)  # make pixel into complex number with x and y val
+    zn = zn - (poly / sp.Derivative(poly))
 
-# function returning a tuple of rgb colors
+    for key in roots_dict:
+        if roots_dict[key] - zn < 0.1:
+            key + 1
+            return to_rgb(zn)
+    return (0, 0, 0)  # default color
 
 
 def to_rgb(i):
@@ -33,13 +39,9 @@ def to_rgb(i):
     return tuple(color.astype(int))
 
 
-# function that takes each pixel in the image and uses the NR formula to
-# calculate fractal
-
-img = Image.new("RGB", (WIDTH, HEIGHT))
-pixels = img.load
-
-# each pixel = point in the fractal, putting newton's formula on each pixel
-for x in range(img.size[0]):
+for x in range(img.size[0]):  # iterate for every pixel on the image
     for y in range(img.size[1]):
         pixels[x, y] = newton(x, y)
+
+
+img.show()
